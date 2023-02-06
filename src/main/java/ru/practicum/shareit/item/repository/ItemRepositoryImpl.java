@@ -10,6 +10,7 @@ import java.util.*;
 @Slf4j
 public class ItemRepositoryImpl implements ItemRepository {
     private final Map<Long, Item> items = new HashMap<>();
+    private final Map<Long, List<Item>> userItemIndex = new LinkedHashMap<>();
 
     private Long id = 1L;
 
@@ -31,6 +32,8 @@ public class ItemRepositoryImpl implements ItemRepository {
         id++;
         items.put(item.getId(), item);
         log.info("Item with ID {} was created.", item.getId());
+        final List<Item> items = userItemIndex.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>());
+        items.add(item);
         return item;
     }
 

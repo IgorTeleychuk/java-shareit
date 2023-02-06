@@ -1,33 +1,30 @@
 package ru.practicum.shareit.user.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
 
+import static java.util.stream.Collectors.toList;
+import static ru.practicum.shareit.user.dto.UserMapper.toUser;
 import static ru.practicum.shareit.user.dto.UserMapper.toUserDto;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     @Override
     public List<UserDto> getAll() {
-        List<UserDto> users = new ArrayList<>();
-        for (User user : userRepository.findAll()) {
-            users.add(toUserDto(user));
-        }
-
-        return users;
+        return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(toList());
     }
 
     @Override
@@ -39,26 +36,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto create(User user) {
+    public UserDto create(UserDto userDto) {
+        User user = toUser(userDto);
         throwIfEmailNotUnique(user);
 
         return toUserDto(userRepository.create(user));
     }
 
     @Override
-    public UserDto update(User user, Long id) {
+    public UserDto update(UserDto userDto, Long id) {
+        User user = toUser(userDto);
         User updatedUser = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User data cannot be updated. " +
                         "No user with ID: " + id));
-        if (user.getEmail() != null) {
-            throwIfEmailNotUnique(user);
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            if(userDto.getName() == null) {
+                throwIfEmailNotUnique(user);
+            }
             updatedUser.setEmail(user.getEmail());
         }
-        if (user.getName() != null) {
+        if (user.getName() != null && !user.getName().isBlank()) {
             updatedUser.setName(user.getName());
         }
 
-        return toUserDto(userRepository.update(updatedUser));
+        return toUserDto(updatedUser);
     }
 
     @Override

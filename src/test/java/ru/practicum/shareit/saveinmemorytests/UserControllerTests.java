@@ -23,21 +23,21 @@ class UserControllerTests {
 
     @Test
     void createTest() {
-        UserDto userDto = userController.create(UserMapper.toUser(user));
+        UserDto userDto = userController.create(user);
         assertEquals(userDto.getId(), userController.getById(userDto.getId()).getId());
     }
 
     @Test
     void updateTest() {
-        userController.create(UserMapper.toUser(user));
+        userController.create(user);
         UserDto userDto = user.toBuilder().email("update@email.com").build();
-        userController.update(UserMapper.toUser(userDto), 1L);
+        userController.update((userDto), 1L);
         assertEquals(userDto.getEmail(), userController.getById(1L).getEmail());
     }
 
     @Test
     void deleteTest() {
-        UserDto userDto = userController.create(UserMapper.toUser(user));
+        UserDto userDto = userController.create(user);
         assertEquals(userController.getAll().size(), 1);
         userController.delete(userDto.getId());
         assertEquals(0, userController.getAll().size());

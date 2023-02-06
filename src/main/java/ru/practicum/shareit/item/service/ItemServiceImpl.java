@@ -3,14 +3,20 @@ package ru.practicum.shareit.item.service;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collector;
 
+import static java.util.stream.Collectors.toList;
 import static ru.practicum.shareit.item.dto.ItemMapper.toItem;
 import static ru.practicum.shareit.item.dto.ItemMapper.toItemDto;
 
@@ -32,7 +38,6 @@ public class ItemServiceImpl implements ItemService {
                 items.add(toItemDto(item));
             }
         }
-
         return items;
     }
 
@@ -63,17 +68,17 @@ public class ItemServiceImpl implements ItemService {
         if (!item.getOwner().getId().equals(userId)) {
             throw new NotFoundException("Do not possible update Item with ID: " + userId + "Not found Item");
         }
-        if (itemDto.getName() != null) {
+        if (itemDto.getName() != null && !itemDto.getName().isBlank()) {
             item.setName(itemDto.getName());
         }
-        if (itemDto.getDescription() != null) {
+        if (itemDto.getDescription() != null && !itemDto.getDescription().isBlank()) {
             item.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null) {
             item.setAvailable(itemDto.getAvailable());
         }
 
-        return toItemDto(itemRepository.update(item));
+        return toItemDto(item);
     }
 
     @Override
@@ -85,15 +90,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> search(String text) {
         List<ItemDto> searchedItems = new ArrayList<>();
-        if (text.isBlank()) {
-            return searchedItems;
-        }
         for (Item item : itemRepository.findAll()) {
             if (isSearched(text, item)) {
                 searchedItems.add(toItemDto(item));
             }
         }
-
         return searchedItems;
     }
 

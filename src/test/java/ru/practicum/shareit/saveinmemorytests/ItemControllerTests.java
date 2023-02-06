@@ -8,7 +8,6 @@ import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.dto.UserMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,14 +33,14 @@ class ItemControllerTests {
 
     @Test
     void createTest() {
-        userController.create(UserMapper.toUser(userDto));
+        userController.create(userDto);
         ItemDto item = itemController.create(1L, itemDto);
         assertEquals(item.getId(), itemController.getById(item.getId()).getId());
     }
 
     @Test
     void updateTest() {
-        userController.create(UserMapper.toUser(userDto));
+        userController.create(userDto);
         itemController.create(1L, itemDto);
         ItemDto item = itemDto.toBuilder().description("updateDescription").build();
         itemController.update(item, 1L, 1L);
@@ -50,7 +49,7 @@ class ItemControllerTests {
 
     @Test
     void deleteTest() {
-        userController.create(UserMapper.toUser(userDto));
+        userController.create(userDto);
         itemController.create(1L, itemDto);
         assertEquals(1, itemController.getAll(1L).size());
         itemController.delete(1L);
@@ -59,7 +58,7 @@ class ItemControllerTests {
 
     @Test
     void searchTest() {
-        userController.create(UserMapper.toUser(userDto));
+        userController.create(userDto);
         itemController.create(1L, itemDto);
         assertEquals(1, itemController.search("Desc").size());
     }
