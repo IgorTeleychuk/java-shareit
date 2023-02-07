@@ -16,5 +16,5 @@ public interface ItemRepository {
 
     void delete(Long id);
 
-    List<Item> getAllByUser (Long id);
+    List<Item> getAllByUser(Long id);
 }
