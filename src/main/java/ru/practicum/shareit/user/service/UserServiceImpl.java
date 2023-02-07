@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 import static ru.practicum.shareit.user.dto.UserMapper.toUser;
@@ -48,9 +49,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("User data cannot be updated. " +
                         "No user with ID: " + id));
         if (user.getEmail() != null && !user.getEmail().isBlank()) {
-            if (userDto.getName() == null) {
                 throwIfEmailNotUnique(user);
-            }
             updatedUser.setEmail(user.getEmail());
         }
         if (user.getName() != null && !user.getName().isBlank()) {
@@ -68,7 +67,7 @@ public class UserServiceImpl implements UserService {
 
     private void throwIfEmailNotUnique(User user) {
         for (User userCheck : userRepository.findAll()) {
-            if (user.getEmail().equals(userCheck.getEmail())) {
+            if (user.getEmail().equals(userCheck.getEmail()) && !Objects.equals(user.getId(), userCheck.getId())) {
                 throw new ValidationException("The user with this email is already registered");
             }
         }

@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -10,6 +11,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.item.dto.ItemMapper.toItem;
 import static ru.practicum.shareit.item.dto.ItemMapper.toItemDto;
@@ -27,10 +29,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getAll(Long userId) {
         List<ItemDto> items = new ArrayList<>();
-        for (Item item : itemRepository.findAll()) {
-            if (item.getOwner().getId().equals(userId)) {
+        for (Item item : itemRepository.getAllByUser(userId)) {
                 items.add(toItemDto(item));
-            }
         }
         return items;
     }
@@ -83,13 +83,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(String text) {
-        List<ItemDto> searchedItems = new ArrayList<>();
-        for (Item item : itemRepository.findAll()) {
-            if (isSearched(text, item)) {
-                searchedItems.add(toItemDto(item));
-            }
-        }
-        return searchedItems;
+        return itemRepository.findAll().stream().filter(i ->
+                isSearched(text, i)).map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     private Boolean isSearched(String text, Item item) {

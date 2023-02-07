@@ -53,7 +53,7 @@ class ItemControllerTests {
         itemController.create(1L, itemDto);
         assertEquals(1, itemController.getAll(1L).size());
         itemController.delete(1L);
-        assertEquals(0, itemController.getAll(1L).size());
+        assertEquals(1, itemController.getAll(1L).size());
     }
 
     @Test

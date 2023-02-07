@@ -21,9 +21,14 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
+    public List<Item> getAllByUser(Long id) {
+        return userItemIndex.get(id);
+    }
+
+    @Override
     public Optional<Item> findById(Long id) {
         log.info("Item with ID {} was found.", id);
-        return items.get(id) != null ? Optional.of(items.get(id)) : Optional.empty();
+        return Optional.ofNullable(items.get(id));
     }
 
     @Override
