@@ -22,7 +22,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> getAllByUser(Long id) {
-        return userItemIndex.get(id);
+        return userItemIndex.getOrDefault(id, List.of());
     }
 
     @Override

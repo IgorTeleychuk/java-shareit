@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("User data cannot be updated. " +
                         "No user with ID: " + id));
         if (user.getEmail() != null && !user.getEmail().isBlank()) {
-                throwIfEmailNotUnique(user);
+            throwIfEmailNotUnique(user);
             updatedUser.setEmail(user.getEmail());
         }
         if (user.getName() != null && !user.getName().isBlank()) {
