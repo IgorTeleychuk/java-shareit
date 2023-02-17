@@ -30,14 +30,14 @@ class UserControllerTests {
     void updateTest() {
         userController.create(user);
         UserDto userDto = user.toBuilder().email("update@email.com").build();
-        userController.update((userDto), 1L);
+        userController.update(userDto, 1L);
         assertEquals(userDto.getEmail(), userController.getById(1L).getEmail());
     }
 
     @Test
     void deleteTest() {
         UserDto userDto = userController.create(user);
-        assertEquals(userController.getAll().size(), 1);
+        assertEquals(1, userController.getAll().size());
         userController.delete(userDto.getId());
         assertEquals(0, userController.getAll().size());
     }
