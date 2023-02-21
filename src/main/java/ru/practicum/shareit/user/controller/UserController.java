@@ -26,25 +26,25 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserDto getById(@PathVariable Long id) {
-        log.info("GET:/users/{id} request received");
+        log.info("GET:/users/{id} request received with parameters:id = {}", id);
         return userService.getById(id);
     }
 
     @PostMapping
     public UserDto create(@Validated(Create.class) @RequestBody UserDto userDto) {
-        log.info("POST:/users request received");
+        log.info("POST:/users request received with parameters: userDto = {}", userDto);
         return userService.create(userDto);
     }
 
     @PatchMapping("/{id}")
     public UserDto update(@Validated(Update.class) @RequestBody UserDto userDto, @PathVariable Long id) {
-        log.info("PATCH:/users/{id} request received");
+        log.info("PATCH:/users/{id} request received with parameters: userDto = {}, id = {}", userDto, id);
         return userService.update(userDto, id);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        log.info("DELETE:/users/{id} request received");
+        log.info("DELETE:/users/{id} request received with parameters: id = {}", id);
         userService.delete(id);
     }
 }

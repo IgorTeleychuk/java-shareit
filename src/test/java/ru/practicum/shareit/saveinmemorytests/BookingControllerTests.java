@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -30,7 +31,7 @@ class BookingControllerTests {
     @Autowired
     private ItemController itemController;
 
-    private ItemDto itemDto = ItemDto.builder()
+    private ItemShortDto itemDto = ItemShortDto.builder()
             .name("name")
             .description("description")
             .available(true)

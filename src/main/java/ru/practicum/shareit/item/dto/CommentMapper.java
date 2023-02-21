@@ -22,5 +22,13 @@ public class CommentMapper {
                 .created(comment.getCreated())
                 .build();
     }
+
+    public static Comment toComment(CommentShortDto commentShortDto) {
+        return Comment.builder()
+                .id(commentShortDto.getId())
+                .text(commentShortDto.getText())
+                .created(commentShortDto.getCreated())
+                .build();
+    }
 }
 

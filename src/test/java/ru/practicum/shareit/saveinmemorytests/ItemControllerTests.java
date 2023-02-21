@@ -8,7 +8,9 @@ import ru.practicum.shareit.booking.controller.BookingController;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentShortDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -28,7 +30,7 @@ class ItemControllerTests {
     @Autowired
     private BookingController bookingController;
 
-    private ItemDto itemDto = ItemDto.builder()
+    private ItemShortDto itemDto = ItemShortDto.builder()
             .name("name")
             .description("description")
             .available(true)
@@ -50,7 +52,7 @@ class ItemControllerTests {
     void updateTest() {
         userController.create(userDto);
         itemController.create(1L, itemDto);
-        ItemDto item = itemDto.toBuilder().description("updateDescription").build();
+        ItemShortDto item = itemDto.toBuilder().description("updateDescription").build();
         itemController.update(item, 1L, 1L);
         assertEquals(item.getDescription(), itemController.getById(1L, 1L).getDescription());
     }
@@ -73,7 +75,7 @@ class ItemControllerTests {
 
     @Test
     void createCommentTest() {
-        CommentDto comment = CommentDto.builder().text("first comment").build();
+        CommentShortDto comment = CommentShortDto.builder().text("first comment").build();
         UserDto user = userController.create(userDto);
         ItemDto item = itemController.create(1L, itemDto);
         UserDto user2 = userController.create(userDto.toBuilder().email("email2@mail.com").build());

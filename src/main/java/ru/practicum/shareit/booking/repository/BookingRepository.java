@@ -4,10 +4,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByItemIdOrderByStartAsc(Long itemId);
@@ -38,4 +40,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByItemOwnerAndStartAfter(User owner, LocalDateTime start, Sort sort);
 
     List<Booking> findAllByItemOwnerAndStatusEquals(User owner, BookingStatus status, Sort sort);
+
+    List<Booking> findAllByItemIdAndStatus(Long itemId, BookingStatus approved,Sort sort);
+
+    List<Booking> findByItemInAndStatusEquals(List<Item> items, BookingStatus stat);
+
+    Optional<Booking> findFirstByItemIdInAndStartLessThanEqualAndStatus(List<Long> idItems, LocalDateTime now,
+                                                                        BookingStatus approved, Sort sort);
+
+    Optional<Booking> findFirstByItemIdInAndStartAfterAndStatus(List<Long> idItems, LocalDateTime now,
+                                                                BookingStatus approved, Sort sort);
+
 }

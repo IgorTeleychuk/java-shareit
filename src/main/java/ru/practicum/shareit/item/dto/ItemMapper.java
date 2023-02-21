@@ -26,4 +26,13 @@ public class ItemMapper {
                 .available(itemDto.getAvailable())
                 .build();
     }
+
+    public static Item toItem(ItemShortDto itemShortDto) {
+        return Item.builder()
+                .id(itemShortDto.getId())
+                .name(itemShortDto.getName())
+                .description(itemShortDto.getDescription())
+                .available(itemShortDto.getAvailable())
+                .build();
+    }
 }
