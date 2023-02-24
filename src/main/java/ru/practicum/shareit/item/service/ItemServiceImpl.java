@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dto.BookingForItemDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
-import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
@@ -19,6 +19,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -27,7 +28,6 @@ import java.util.stream.Collectors;
 import static java.time.LocalDateTime.now;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.data.domain.Sort.Direction.DESC;
-import static ru.practicum.shareit.booking.dto.BookingMapper.toBookingShortDto;
 import static ru.practicum.shareit.booking.model.BookingStatus.APPROVED;
 import static ru.practicum.shareit.item.dto.CommentMapper.toComment;
 import static ru.practicum.shareit.item.dto.CommentMapper.toCommentDto;
@@ -35,7 +35,7 @@ import static ru.practicum.shareit.item.dto.ItemMapper.toItem;
 import static ru.practicum.shareit.item.dto.ItemMapper.toItemDto;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
@@ -46,26 +46,12 @@ public class ItemServiceImpl implements ItemService {
 
     private final CommentRepository commentRepository;
 
-    @Transactional(readOnly = true)
     @Override
     public List<ItemDto> getAll(Long userId) {
         List<Item> items = itemRepository.findAllByOwnerId(userId);
         List<ItemDto> itemDtoList = items.stream().map(ItemMapper::toItemDto).collect(toList());
         List<Long> idItems = itemDtoList.stream().map(ItemDto::getId).collect(Collectors.toList());
-
-        Map<Long, BookingShortDto> lastBookings = bookingRepository.findFirstByItemIdInAndStartLessThanEqualAndStatus(
-                        idItems, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
-                .stream()
-                .map(BookingMapper::toBookingShortDto)
-                .collect(Collectors.toMap(BookingShortDto::getItemId, Function.identity()));
-        itemDtoList.forEach(i -> i.setLastBooking(lastBookings.get(i.getId())));
-
-        Map<Long, BookingShortDto> nextBookings = bookingRepository.findFirstByItemIdInAndStartAfterAndStatus(
-                        idItems, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "start"))
-                .stream()
-                .map(BookingMapper::toBookingShortDto)
-                .collect(Collectors.toMap(BookingShortDto::getItemId, Function.identity()));
-        itemDtoList.forEach(i -> i.setNextBooking(nextBookings.get(i.getId())));
+        getAllBookingsByItem(itemDtoList, idItems);
 
         Map<Long, List<CommentDto>> comments = commentRepository.findByItemIdIn(idItems, Sort.by(DESC, "created"))
                 .stream()
@@ -76,24 +62,24 @@ public class ItemServiceImpl implements ItemService {
         return itemDtoList;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public ItemDto getById(Long id, Long ownerId) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Not Found Item with Id: " + id));
-        ItemDto itemDto = toItemDto(item);
+        List<ItemDto> itemDtoList = new ArrayList<>();
+        itemDtoList.add(toItemDto(item));
+        if (item.getOwner().getId().equals(ownerId)) {
+            List<Long> idItems = itemDtoList.stream().map(ItemDto::getId).collect(Collectors.toList());
+            getAllBookingsByItem(itemDtoList, idItems);
+        }
+        ItemDto itemDto = itemDtoList.get(0);
         itemDto.setComments(commentRepository.findAllByItemId(id)
                 .stream().map(CommentMapper::toCommentDto).collect(toList()));
-        if (item.getOwner().getId().equals(ownerId)) {
-            itemDto.setLastBooking(bookingRepository.findAllByItemIdOrderByStartAsc(id).isEmpty() ? null :
-                    toBookingShortDto(bookingRepository.findAllByItemIdOrderByStartAsc(id).get(0)));
-            itemDto.setNextBooking(itemDto.getLastBooking() == null ? null :
-                    toBookingShortDto(bookingRepository.findAllByItemIdOrderByStartDesc(itemDto.getId()).get(0)));
-        }
 
         return itemDto;
     }
 
+    @Transactional
     @Override
     public ItemDto create(ItemShortDto itemShortDto, Long userId) {
         User user = userRepository.findById(userId)
@@ -106,6 +92,7 @@ public class ItemServiceImpl implements ItemService {
         return toItemDto(item);
     }
 
+    @Transactional
     @Override
     public ItemDto update(ItemShortDto itemShortDto, Long id, Long userId) {
         Item item = itemRepository.findById(id)
@@ -127,12 +114,12 @@ public class ItemServiceImpl implements ItemService {
         return toItemDto(itemRepository.save(item));
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         itemRepository.deleteById(id);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<ItemDto> search(String text) {
         Boolean available = true;
@@ -140,6 +127,7 @@ public class ItemServiceImpl implements ItemService {
                 text, available).stream().map(ItemMapper::toItemDto).collect(toList());
     }
 
+    @Transactional
     @Override
     public CommentDto createComment(Long itemId, Long userId, CommentShortDto commentShortDto) {
         User user = userRepository.findById(userId)
@@ -160,5 +148,23 @@ public class ItemServiceImpl implements ItemService {
         commentRepository.save(comment);
 
         return toCommentDto(comment);
+    }
+
+    private void getAllBookingsByItem (List<ItemDto> itemDtoList,  List<Long> idItems) {
+
+        Map<Long, BookingForItemDto> lastBookings = bookingRepository.findFirstByItemIdInAndStartLessThanEqualAndStatus(
+                        idItems, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
+                .stream()
+                .map(BookingMapper::toBookingForItemDto)
+                .collect(Collectors.toMap(BookingForItemDto::getItemId, Function.identity()));
+        itemDtoList.forEach(i -> i.setLastBooking(lastBookings.get(i.getId())));
+
+        Map<Long, BookingForItemDto> nextBookings = bookingRepository.findFirstByItemIdInAndStartAfterAndStatus(
+                        idItems, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.ASC, "start"))
+                .stream()
+                .map(BookingMapper::toBookingForItemDto)
+                .collect(Collectors.toMap(BookingForItemDto::getItemId, Function.identity()));
+        itemDtoList.forEach(i -> i.setNextBooking(nextBookings.get(i.getId())));
+
     }
 }

@@ -16,18 +16,16 @@ import static ru.practicum.shareit.user.dto.UserMapper.toUser;
 import static ru.practicum.shareit.user.dto.UserMapper.toUserDto;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
     @Override
     public List<UserDto> getAll() {
         return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(toList());
     }
 
-    @Transactional(readOnly = true)
     @Override
     public UserDto getById(Long id) {
         User user = userRepository.findById(id)
@@ -36,12 +34,14 @@ public class UserServiceImpl implements UserService {
         return toUserDto(user);
     }
 
+    @Transactional
     @Override
     public UserDto create(UserDto userDto) {
         User user = toUser(userDto);
         return toUserDto(userRepository.save(user));
     }
 
+    @Transactional
     @Override
     public UserDto update(UserDto userDto, Long id) {
         User updatedUser = userRepository.findById(id)
@@ -57,6 +57,7 @@ public class UserServiceImpl implements UserService {
         return toUserDto(updatedUser);
     }
 
+    @Transactional
     @Override
     public void delete(Long id) {
         userRepository.deleteById(id);

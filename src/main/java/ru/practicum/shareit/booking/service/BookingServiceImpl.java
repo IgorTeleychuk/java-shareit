@@ -26,7 +26,7 @@ import static ru.practicum.shareit.booking.dto.BookingMapper.toBookingDto;
 import static ru.practicum.shareit.booking.model.BookingStatus.*;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
@@ -37,6 +37,7 @@ public class BookingServiceImpl implements BookingService {
 
     private final Sort sort = Sort.by(Sort.Direction.DESC, "start");
 
+    @Transactional
     @Override
     public BookingDto create(BookingShortDto bookingShortDto, Long userId) {
         User user = userRepository.findById(userId)
@@ -66,6 +67,7 @@ public class BookingServiceImpl implements BookingService {
         return toBookingDto(booking);
     }
 
+    @Transactional
     @Override
     public BookingDto approve(Long bookingId, Long userId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
@@ -88,32 +90,31 @@ public class BookingServiceImpl implements BookingService {
         return toBookingDto(booking);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<BookingDto> getAllByOwner(Long userId, String state) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Not found Bookings - " +
                         "there is no User with Id " + userId));
         List<Booking> bookingDtoList;
-        switch (state) {
-            case "ALL":
+        switch (BookingState.valueOf(state)) {
+            case ALL:
                 bookingDtoList = bookingRepository.findAllByItemOwner(user,sort);
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookingDtoList = bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(user,
                         LocalDateTime.now(), LocalDateTime.now(), sort);
                 break;
-            case "PAST":
+            case PAST:
                 bookingDtoList = bookingRepository.findAllByItemOwnerAndEndBefore(user,
                         LocalDateTime.now(), sort);
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookingDtoList = bookingRepository.findAllByItemOwnerAndStartAfter(user, LocalDateTime.now(), sort);
                 break;
-            case "WAITING":
+            case WAITING:
                 bookingDtoList = bookingRepository.findAllByItemOwnerAndStatusEquals(user, WAITING, sort);
                 break;
-            case "REJECTED":
+            case REJECTED:
                 bookingDtoList = bookingRepository.findAllByItemOwnerAndStatusEquals(user, REJECTED, sort);
                 break;
             default:
@@ -123,7 +124,6 @@ public class BookingServiceImpl implements BookingService {
         return bookingDtoList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     @Override
     public List<BookingDto> getAllByUser(Long userId, String state) {
         User user = userRepository.findById(userId)
@@ -158,7 +158,6 @@ public class BookingServiceImpl implements BookingService {
         return bookingDtoList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     @Override
     public BookingDto getById(Long bookingId, Long userId) {
         Booking booking = bookingRepository.findById(bookingId)
