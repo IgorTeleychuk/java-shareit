@@ -151,7 +151,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void getAllBookingsByItem (List<ItemDto> itemDtoList,  List<Long> idItems) {
-
         Map<Long, BookingForItemDto> lastBookings = bookingRepository.findFirstByItemIdInAndStartLessThanEqualAndStatus(
                         idItems, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
                 .stream()
