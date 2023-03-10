@@ -137,8 +137,8 @@ class ItemServiceImplTest {
 
     @Test
     void search() {
-        Mockito.when(itemRepository.
-                        findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAndAvailable("text",
+        Mockito.when(itemRepository
+                        .findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAndAvailable("text",
                                 "text", true))
                 .thenReturn(List.of(item));
 
