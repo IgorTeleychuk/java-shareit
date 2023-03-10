@@ -8,6 +8,8 @@ import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @Slf4j
@@ -33,17 +35,21 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getAllByOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                          @RequestParam(defaultValue = "ALL") String state) {
-        log.info("GET:/bookings/owner request received with parameters: userId = {}, state = {}", userId, state);
-        return bookingService.getAllByOwner(userId, state);
+    public List<BookingDto> getAllByOwner(@RequestHeader("X-Sharer-User-Id") Long ownerId,
+                                          @RequestParam(defaultValue = "ALL") String state,
+                                          @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                          @Positive @RequestParam(defaultValue = "10") Integer size) {
+        log.info("GET /bookings/owner?state={}&from={}&size={}.", state, from, size);
+        return bookingService.getAllByOwnerId(ownerId, state, from, size);
     }
 
     @GetMapping
-    public List<BookingDto> getAllByUser(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                         @RequestParam(defaultValue = "ALL") String state) {
-        log.info("GET:/bookings request received with parameters: userId = {}, state = {}", userId, state);
-        return bookingService.getAllByUser(userId, state);
+    public List<BookingDto> getAllByUser(@RequestHeader("X-Sharer-User-Id") Long bookerId,
+                                           @RequestParam(defaultValue = "ALL") String state,
+                                           @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                           @Positive @RequestParam(defaultValue = "10") Integer size) {
+        log.info("GET /bookings?state={}&from={}&size={}.", state, from, size);
+        return bookingService.getAllByBookerId(bookerId, state, from, size);
     }
 
     @GetMapping("/{bookingId}")

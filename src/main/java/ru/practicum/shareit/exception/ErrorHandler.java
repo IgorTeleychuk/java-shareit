@@ -21,7 +21,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException exception) {
         log.error("Validation error {}", exception.getMessage());
         return new ErrorResponse(
