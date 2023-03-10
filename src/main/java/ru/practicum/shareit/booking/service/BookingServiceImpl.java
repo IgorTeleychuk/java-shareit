@@ -182,7 +182,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    public void validationUserAndFrom (Long userId, Integer from) {
+    public void validationUserAndFrom(Long userId, Integer from) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Not found User with Id:" + userId);
         }

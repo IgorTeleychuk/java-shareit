@@ -136,8 +136,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public CommentDto createComment(Long itemId, Long userId, CommentShortDto commentShortDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Not possible create Comment - " +
-                        "Does not exist User with Id " + userId));
+                .orElseThrow(() -> new NotFoundException("Not possible create Comment - "
+                        + "Does not exist User with Id " + userId));
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Not possible create Comment - " +
                         "Does not exist Item with Id " + itemId));
