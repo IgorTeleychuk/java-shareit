@@ -255,4 +255,11 @@ class ItemServiceImplTest {
         assertEquals("comment", actualDdo.getText());
         assertEquals("Alex", actualDdo.getAuthorName());
     }
+
+    @Test
+    void delete_shouldDeleteItemAndReturnDeletedItem() {
+        Long itemId = 1L;
+        itemService.delete(itemId);
+        Mockito.verify(itemRepository).deleteById(itemId);
+    }
 }
