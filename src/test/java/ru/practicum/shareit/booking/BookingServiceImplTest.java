@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
@@ -377,6 +378,18 @@ class BookingServiceImplTest {
             assertThrows(BadRequestException.class, () -> bookingService.create(dto, userId));
 
             Mockito.verify(bookingRepository, Mockito.never()).save(Mockito.any());
+        }
+
+        @Test
+        void approve() {
+            BookingDto bookingDto = BookingMapper.toBookingDto(booking);
+            BookingDto bookingDtoTest;
+
+            Mockito.when(bookingRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(booking));
+            bookingDtoTest = bookingService.approve(1L,1L, true);
+            bookingDto.setStatus(BookingStatus.APPROVED);
+
+            assertThat(bookingDtoTest).isEqualTo(bookingDto);
         }
     }
 }
