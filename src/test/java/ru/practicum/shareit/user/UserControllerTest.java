@@ -139,6 +139,25 @@ class UserControllerTest {
 
     @SneakyThrows
     @Test
+    void create_whenUserIdNotFound() {
+        Long userId = 2L;
+        UserDto createUserDto = new UserDto(null, null, "alex.b@yandex.ru");
+
+        mockMvc.perform(post("/users", userId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(createUserDto)))
+                .andExpect(status().isBadRequest());
+
+        createUserDto.setName(" ");
+        mockMvc.perform(post("/users", userId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(createUserDto)))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(userService, Mockito.never()).create(createUserDto);
+    }
+
+    @SneakyThrows
+    @Test
     void deleteById() {
         Long userId = 1L;
         mockMvc.perform(delete("/users/{id}", userId))
