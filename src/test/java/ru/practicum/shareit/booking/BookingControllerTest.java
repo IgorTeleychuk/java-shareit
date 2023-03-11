@@ -196,4 +196,26 @@ class BookingControllerTest {
 
         Mockito.verify(bookingService, Mockito.never()).create(Mockito.any(), Mockito.anyLong());
     }
+
+    @SneakyThrows
+    @Test
+    void approve() {
+        Long bookingId = 1L;
+        BookingDto bookingDto = new BookingDto(bookingId, start, end,  BookingStatus.WAITING, null, null);
+
+        Mockito.when(bookingService.approve(Mockito.anyLong(), Mockito.anyLong(),
+                Mockito.anyBoolean())).thenReturn(bookingDto);
+
+        String result = mockMvc.perform(patch("/bookings/{bookingId}", bookingId)
+                        .header("X-Sharer-User-Id", 1)
+                        .param("bookingId", "1L")
+                        .param("approved", "true"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertEquals(objectMapper.writeValueAsString(bookingDto), result);
+    }
 }

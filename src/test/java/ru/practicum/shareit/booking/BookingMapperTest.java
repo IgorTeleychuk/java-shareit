@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingForItemDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -13,6 +14,7 @@ import ru.practicum.shareit.user.model.User;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static ru.practicum.shareit.booking.dto.BookingMapper.toBookingForItemDto;
 
 class BookingMapperTest {
     private Item item;
@@ -74,5 +76,16 @@ class BookingMapperTest {
         assertThat(dto.getEnd()).isEqualTo(booking.getEnd());
         assertThat(dto.getItemId()).isEqualTo(item.getId());
         assertThat(dto.getId()).isEqualTo(user.getId());
+    }
+
+    @Test
+    void toBookingFromItem() {
+        BookingForItemDto bookingForItemDto = toBookingForItemDto(booking);
+
+        assertThat(bookingForItemDto.getId()).isEqualTo(1L);
+        assertThat(bookingForItemDto.getStart()).isEqualTo(start);
+        assertThat(bookingForItemDto.getEnd()).isEqualTo(end);
+        assertThat(bookingForItemDto.getItemId()).isEqualTo(item.getId());
+        assertThat(bookingForItemDto.getBookerId()).isEqualTo(1L);
     }
 }
