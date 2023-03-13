@@ -40,7 +40,7 @@ public class ItemMapper {
     }
 
     public static List<ItemDto> toDtoShortList(List<Item> items) {
-        if(items != null) {
+        if (items != null) {
             return items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
         } else {
             return List.of();
