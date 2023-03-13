@@ -46,7 +46,7 @@ class ItemRepositoryTest {
                 null);
         itemRepository.save(item2);
 
-        itemRequest = new ItemRequest(null, "description", user, LocalDateTime.now(), List.of(item1));
+        itemRequest = new ItemRequest(null, "description", user, LocalDateTime.now());
         itemRequestRepository.save(itemRequest);
     }
 

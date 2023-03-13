@@ -186,9 +186,5 @@ public class BookingServiceImpl implements BookingService {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("Not found User with Id:" + userId);
         }
-
-        if (from < 0) {
-            throw new ValidationException("From can not be a negative number" + from);
-        }
     }
 }

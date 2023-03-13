@@ -48,7 +48,7 @@ public class ItemRequestController {
     }
 
     @PostMapping
-    public ItemRequestDtoShort create(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemRequestDto create(@RequestHeader("X-Sharer-User-Id") Long userId,
                                       @Valid @RequestBody ItemRequestDtoShort itemRequestDto) {
         log.info("POST /requests received with parameters: itemRequestDto = {}", itemRequestDto);
         return itemRequestService.create(userId, itemRequestDto);

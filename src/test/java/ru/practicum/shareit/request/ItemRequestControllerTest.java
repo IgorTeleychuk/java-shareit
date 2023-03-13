@@ -110,10 +110,10 @@ class ItemRequestControllerTest {
 
         ItemRequestDtoShort dtoShortRequestShort = new ItemRequestDtoShort(1L, "description",
                 null, null);
-        ItemRequestDtoShort dtoShortResponse = new ItemRequestDtoShort(null, "description", userId,
-                null);
+        ItemRequestDto dtoResponse = new ItemRequestDto(1L, "description", null,
+                null, List.of());
 
-        Mockito.when(itemRequestService.create(Mockito.any(), Mockito.any())).thenReturn(dtoShortResponse);
+        Mockito.when(itemRequestService.create(Mockito.any(), Mockito.any())).thenReturn(dtoResponse);
 
         String result = mockMvc.perform(post("/requests")
                         .header("X-Sharer-User-Id", userId)
@@ -124,6 +124,6 @@ class ItemRequestControllerTest {
                 .getResponse()
                 .getContentAsString();
 
-        assertEquals(objectMapper.writeValueAsString(dtoShortResponse), result);
+        assertEquals(objectMapper.writeValueAsString(dtoResponse), result);
     }
 }

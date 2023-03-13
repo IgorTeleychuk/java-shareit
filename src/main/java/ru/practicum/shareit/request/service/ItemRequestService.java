@@ -8,7 +8,7 @@ import java.util.List;
 public interface ItemRequestService {
     ItemRequestDto getById(Long userId, Long requestId);
 
-    ItemRequestDtoShort create(Long userId, ItemRequestDtoShort itemRequestDtoShort);
+    ItemRequestDto create(Long userId, ItemRequestDtoShort itemRequestDtoShort);
 
     List<ItemRequestDto> getAll(Long userId, Integer from, Integer size);
 

@@ -2,9 +2,8 @@ package ru.practicum.shareit.request.dto;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.model.ItemRequest;
-
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,11 +33,16 @@ public class ItemRequestMapper {
                 .description(itemRequest.getDescription())
                 .requesterId(itemRequest.getRequester().getId())
                 .created(itemRequest.getCreated())
-                .items(ItemMapper.toDtoShortList(itemRequest.getItems()))
                 .build();
     }
 
     public static List<ItemRequestDto> toDtoList(List<ItemRequest> itemRequests) {
         return itemRequests.stream().map(ItemRequestMapper::toDto).collect(Collectors.toList());
+    }
+
+    public static ItemRequestDto toItemRequestDto(ItemRequest itemRequest, List<ItemDto> items) {
+        return new ItemRequestDto(itemRequest.getId(), itemRequest.getDescription(),
+                itemRequest.getRequester().getId(),
+                itemRequest.getCreated(), items);
     }
 }

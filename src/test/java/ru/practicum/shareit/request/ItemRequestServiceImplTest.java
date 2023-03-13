@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoShort;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -15,7 +16,6 @@ import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,6 +32,9 @@ class ItemRequestServiceImplTest {
     private UserRepository userRepository;
 
     @Mock
+    ItemRepository itemRepository;
+
+    @Mock
     private ItemRequestRepository itemRequestRepository;
 
     @Test
@@ -44,10 +47,9 @@ class ItemRequestServiceImplTest {
         Mockito.when(itemRequestRepository.save(Mockito.any()))
                 .thenAnswer(invocationOnMock -> invocationOnMock.getArgument(0));
 
-        ItemRequestDtoShort dto = itemRequestService.create(userId, dtoShort);
+        ItemRequestDto dto = itemRequestService.create(userId, dtoShort);
 
         assertThat(dto.getDescription()).isEqualTo(dtoShort.getDescription());
-        assertThat(dto.getCreated()).isBefore(LocalDateTime.now());
     }
 
     @Test
@@ -66,7 +68,7 @@ class ItemRequestServiceImplTest {
     void getAllByRequester_shouldReturnItemRequestDtoList() {
         Long userId = 1L;
         User user = new User(userId, "Alex", "alex.b@yandex.ru");
-        ItemRequest itemRequest = new ItemRequest(1L, "description", user, null, List.of());
+        ItemRequest itemRequest = new ItemRequest(1L, "description", user, null);
         ItemRequestDto itemRequestDto = new ItemRequestDto(1L, "description", userId,
                 null, List.of());
 
@@ -77,6 +79,10 @@ class ItemRequestServiceImplTest {
         List<ItemRequestDto> expectedDtoList = List.of(itemRequestDto);
         List<ItemRequestDto> actualDtoList = itemRequestService.getAllByRequester(userId, 0, 10);
 
+        assertEquals(expectedDtoList.get(0).getId(), actualDtoList.get(0).getId());
+        assertEquals(expectedDtoList.get(0).getDescription(), actualDtoList.get(0).getDescription());
+        assertEquals(expectedDtoList.get(0).getRequesterId(), actualDtoList.get(0).getRequesterId());
+        assertEquals(expectedDtoList.get(0).getItems().size(), actualDtoList.get(0).getItems().size());
         assertEquals(expectedDtoList, actualDtoList);
     }
 
@@ -96,18 +102,21 @@ class ItemRequestServiceImplTest {
         Long userId = 1L;
         User user = new User(userId, "Alex", "alex.b@yandex.ru");
 
-        ItemRequest itemRequest = new ItemRequest(1L, "description", user, null, List.of());
+        ItemRequest itemRequest = new ItemRequest(1L, "description", user, null);
         ItemRequestDto itemRequestDto = new ItemRequestDto(1L, "description", userId,
                 null, List.of());
 
         Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
-        Mockito.when(itemRequestRepository.findAllByUserId(Mockito.anyLong(), Mockito.any()))
+        Mockito.when(itemRequestRepository.findAllByRequesterIdNot(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(List.of(itemRequest));
 
         List<ItemRequestDto> expectedDtoList = List.of(itemRequestDto);
         List<ItemRequestDto> actualDtoList = itemRequestService.getAll(userId, 0, 10);
 
-        assertEquals(expectedDtoList, actualDtoList);
+        assertEquals(expectedDtoList.get(0).getId(), actualDtoList.get(0).getId());
+        assertEquals(expectedDtoList.get(0).getDescription(), actualDtoList.get(0).getDescription());
+        assertEquals(expectedDtoList.get(0).getRequesterId(), actualDtoList.get(0).getRequesterId());
+        assertEquals(expectedDtoList.get(0).getItems().size(), actualDtoList.get(0).getItems().size());
     }
 
     @Test
@@ -126,10 +135,11 @@ class ItemRequestServiceImplTest {
         Long userId = 1L;
         Long requestId = 1L;
         User user = new User(userId, "Alex", "alex.b@yandex.ru");
-        ItemRequest itemRequest = new ItemRequest(1L, "description",  user,null, List.of());
+        ItemRequest itemRequest = new ItemRequest(1L, "description",  user,null);
 
         Mockito.when(userRepository.existsById(Mockito.anyLong())).thenReturn(true);
         Mockito.when(itemRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(itemRequest));
+        Mockito.when(itemRepository.findByRequest_IdOrderById(Mockito.anyLong())).thenReturn(List.of());
 
         ItemRequestDto expected = new ItemRequestDto(1L, "description", userId, null, List.of());
         ItemRequestDto actual = itemRequestService.getById(userId, requestId);

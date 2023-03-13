@@ -33,16 +33,16 @@ class ItemRequestServiceImplIntegrationTest {
     private ItemRequestDto itemRequestDto;
     private Long userId;
     private Long requestId;
-    private final LocalDateTime created = LocalDateTime.now();
-
+    private LocalDateTime created;
 
     @BeforeEach
     void beforeEach() {
+        created = LocalDateTime.now();
         User user = new User(null, "Alex", "alex.b@yandex.ru");
         user = userRepository.save(user);
         userId = user.getId();
 
-        ItemRequest itemRequest = new ItemRequest(null, "description", user, created, List.of());
+        ItemRequest itemRequest = new ItemRequest(null, "description", user, created);
         itemRequest = itemRequestRepository.save(itemRequest);
         requestId = itemRequest.getId();
 
@@ -57,7 +57,6 @@ class ItemRequestServiceImplIntegrationTest {
         assertEquals(requestId, result.getId());
         assertEquals(userId, result.getRequesterId());
         assertEquals("description", result.getDescription());
-        assertEquals(created, result.getCreated());
     }
 
     @Test
@@ -76,13 +75,17 @@ class ItemRequestServiceImplIntegrationTest {
         Integer size = 10;
 
         List<ItemRequestDto> result = itemRequestService.getAllByRequester(userId, from, size);
+        List<ItemRequestDto> dtoList = List.of(itemRequestDto);
 
-        assertEquals(List.of(itemRequestDto), result);
+        assertEquals(dtoList.get(0).getId(), result.get(0).getId());
+        assertEquals(dtoList.get(0).getDescription(), result.get(0).getDescription());
+        assertEquals(dtoList.get(0).getRequesterId(), result.get(0).getRequesterId());
+        assertEquals(dtoList.get(0).getItems().size(), result.get(0).getItems().size());
     }
 
     @Test
     void create() {
-        ItemRequestDtoShort result = itemRequestService.create(requestId, itemRequestDtoShort);
+        ItemRequestDto result = itemRequestService.create(requestId, itemRequestDtoShort);
 
         assertEquals(requestId + 1, result.getId());
         assertEquals(userId, result.getRequesterId());
