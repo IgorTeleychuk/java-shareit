@@ -166,4 +166,21 @@ class UserControllerTest {
 
         Mockito.verify(userService).delete(userId);
     }
+
+    @SneakyThrows
+    @Test
+    void create() {
+        Long userId = 1L;
+        UserDto createUserDto = new UserDto(1L, "Alex", "alex.b@yandex.ru");
+        mockMvc.perform(post("/users")
+                        .header("X-Sharer-User-Id", userId)
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(createUserDto)))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Mockito.verify(userService).create(createUserDto);
+    }
 }
