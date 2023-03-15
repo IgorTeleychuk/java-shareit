@@ -105,7 +105,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<ItemRequestDto> itemRequestDto = new ArrayList<>();
 
         for (ItemRequest itemRequest : requests) {
-            List<Item> itemsTemp = itemRequestsByItem.getOrDefault(itemRequest, new ArrayList<>());
+            List<Item> itemsTemp = itemRequestsByItem.getOrDefault(itemRequest, List.of());
 
             List<ItemDto> itemDtoForRequests = itemsTemp.stream()
                     .map(ItemMapper::toItemDto)
