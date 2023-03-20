@@ -15,6 +15,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -25,12 +26,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.time.LocalDateTime.now;
-import static java.util.stream.Collectors.toList;
 import static org.springframework.data.domain.Sort.Direction.DESC;
-import static ru.practicum.shareit.booking.model.BookingStatus.APPROVED;
-import static ru.practicum.shareit.item.dto.CommentMapper.toComment;
-import static ru.practicum.shareit.item.dto.CommentMapper.toCommentDto;
 import static ru.practicum.shareit.item.dto.ItemMapper.toItem;
 import static ru.practicum.shareit.item.dto.ItemMapper.toItemDto;
 
@@ -46,10 +42,12 @@ public class ItemServiceImpl implements ItemService {
 
     private final CommentRepository commentRepository;
 
+    private final ItemRequestRepository itemRequestRepository;
+
     @Override
     public List<ItemDto> getAll(Long userId) {
         List<Item> items = itemRepository.findAllByOwnerId(userId);
-        List<ItemDto> itemDtoList = items.stream().map(ItemMapper::toItemDto).collect(toList());
+        List<ItemDto> itemDtoList = items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
         List<Long> idItems = itemDtoList.stream().map(ItemDto::getId).collect(Collectors.toList());
         getAllBookingsByItem(itemDtoList, idItems);
 
@@ -74,7 +72,7 @@ public class ItemServiceImpl implements ItemService {
         }
         ItemDto itemDto = itemDtoList.get(0);
         itemDto.setComments(commentRepository.findAllByItemId(id)
-                .stream().map(CommentMapper::toCommentDto).collect(toList()));
+                .stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()));
 
         return itemDto;
     }
@@ -87,8 +85,13 @@ public class ItemServiceImpl implements ItemService {
                         "Not Found User with Id: " + userId));
         Item item = toItem(itemShortDto);
         item.setOwner(user);
-        itemRepository.save(item);
+        Long requestId = itemShortDto.getRequestId();
 
+        if (requestId != null) {
+            item.setRequest(itemRequestRepository.findById(requestId)
+                    .orElseThrow(() -> new NotFoundException("Not found Request with Id:" + requestId)));
+        }
+        itemRepository.save(item);
         return toItemDto(item);
     }
 
@@ -111,6 +114,8 @@ public class ItemServiceImpl implements ItemService {
             item.setAvailable(itemShortDto.getAvailable());
         }
 
+        System.out.println(item.getName());
+
         return toItemDto(itemRepository.save(item));
     }
 
@@ -124,35 +129,34 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> search(String text) {
         Boolean available = true;
         return itemRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAndAvailable(text,
-                text, available).stream().map(ItemMapper::toItemDto).collect(toList());
+                text, available).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Transactional
     @Override
     public CommentDto createComment(Long itemId, Long userId, CommentShortDto commentShortDto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Not possible create Comment - " +
-                        "Does not exist User with Id " + userId));
+                .orElseThrow(() -> new NotFoundException("Not possible create Comment - " + "Does not exist User with Id " + userId));
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Not possible create Comment - " +
                         "Does not exist Item with Id " + itemId));
-        if (bookingRepository.findAllByBookerIdAndItemIdAndStatusEqualsAndEndIsBefore(userId, itemId, APPROVED,
-                now()).isEmpty()) {
+        if (bookingRepository.findAllByBookerIdAndItemIdAndStatusEqualsAndEndIsBefore(userId, itemId, BookingStatus.APPROVED,
+                LocalDateTime.now()).isEmpty()) {
             throw new BadRequestException("Not possible create Comment - " +
                     "Item has not been rented by the user or the rental of the item has not yet been completed");
         }
-        Comment comment = toComment(commentShortDto);
+        Comment comment = CommentMapper.toComment(commentShortDto);
         comment.setItem(item);
         comment.setAuthor(user);
-        comment.setCreated(now());
+        comment.setCreated(LocalDateTime.now());
         commentRepository.save(comment);
 
-        return toCommentDto(comment);
+        return CommentMapper.toCommentDto(comment);
     }
 
     private void getAllBookingsByItem(List<ItemDto> itemDtoList,  List<Long> idItems) {
         Map<Long, BookingForItemDto> lastBookings = bookingRepository.findFirstByItemIdInAndStartLessThanEqualAndStatus(
-                        idItems, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(Sort.Direction.DESC, "start"))
+                        idItems, LocalDateTime.now(), BookingStatus.APPROVED, Sort.by(DESC, "start"))
                 .stream()
                 .map(BookingMapper::toBookingForItemDto)
                 .collect(Collectors.toMap(BookingForItemDto::getItemId, Function.identity()));

@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.shareit.booking.dto.BookingForItemDto;
 
 import java.util.List;
@@ -10,6 +8,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder(toBuilder = true)
+@AllArgsConstructor
+@EqualsAndHashCode
 public class ItemDto {
     private Long id;
 
@@ -24,4 +24,6 @@ public class ItemDto {
     private BookingForItemDto nextBooking;
 
     private List<CommentDto> comments;
+
+    private Long requestId;
 }
