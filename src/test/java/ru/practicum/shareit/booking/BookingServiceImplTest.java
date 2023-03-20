@@ -50,7 +50,7 @@ class BookingServiceImplTest {
     private Item item;
     private Booking booking;
     private final LocalDateTime start = LocalDateTime.now();
-    private final LocalDateTime end = LocalDateTime.now();
+    private final LocalDateTime end = LocalDateTime.now().plusDays(1);
 
     @BeforeEach
     void beforeEach() {

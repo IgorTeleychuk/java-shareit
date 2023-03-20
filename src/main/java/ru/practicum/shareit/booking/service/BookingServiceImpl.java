@@ -58,7 +58,7 @@ public class BookingServiceImpl implements BookingService {
                     "this item is not available");
         }
         Booking booking = toBooking(bookingShortDto);
-        if (booking.getEnd().isBefore(booking.getStart()) || booking.getEnd() == booking.getStart()) {
+        if (booking.getEnd().isBefore(booking.getStart()) || booking.getEnd().equals(booking.getStart())) {
             throw new BadRequestException("Not possible create Booking - " +
                     "the end date of the booking cannot be earlier than the start date of the booking");
         }
