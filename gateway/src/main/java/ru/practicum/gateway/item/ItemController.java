@@ -26,21 +26,21 @@ public class ItemController {
     public ResponseEntity<Object> getItems(@RequestHeader("X-Sharer-User-Id") Long userId,
                                            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        log.info("Получение всех вещей пользователя {}", userId);
+        log.info("Get All Items {}", userId);
         return itemClient.getItems(userId, from, size);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getItem(@PathVariable Long id,
                                           @RequestHeader("X-Sharer-User-Id") Long userId) {
-        log.info("Получение вещи {}", id);
+        log.info("Get Item with Id: {}", id);
         return itemClient.getItem(id, userId);
     }
 
     @PostMapping
     public ResponseEntity<Object> createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                              @RequestBody @Valid ItemRequestDto requestDto) {
-        log.info("Создание вещи");
+        log.info("Create Item");
         return itemClient.createItem(userId, requestDto);
     }
 
