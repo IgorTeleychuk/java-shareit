@@ -21,11 +21,13 @@ import ru.practicum.server.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparing;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static ru.practicum.server.item.dto.ItemMapper.toItem;
 import static ru.practicum.server.item.dto.ItemMapper.toItemDto;
@@ -56,6 +58,7 @@ public class ItemServiceImpl implements ItemService {
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.groupingBy(CommentDto::getId));
         itemDtoList.forEach(i -> i.setComments(comments.get(i.getId())));
+        itemDtoList.sort(comparing(ItemDto::getId));
 
         return itemDtoList;
     }

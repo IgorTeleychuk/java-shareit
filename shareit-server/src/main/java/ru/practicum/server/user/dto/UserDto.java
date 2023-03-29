@@ -1,11 +1,6 @@
 package ru.practicum.server.user.dto;
 
 import lombok.*;
-import ru.practicum.server.util.Create;
-import ru.practicum.server.util.Update;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
@@ -15,10 +10,7 @@ import javax.validation.constraints.NotBlank;
 public class UserDto {
     private Long id;
 
-    @NotBlank(groups = {Create.class})
     private String name;
 
-    @Email(groups = {Create.class, Update.class})
-    @NotBlank(groups = {Create.class})
     private String email;
 }

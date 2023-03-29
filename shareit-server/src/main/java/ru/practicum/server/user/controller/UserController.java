@@ -2,12 +2,9 @@ package ru.practicum.server.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.server.user.dto.UserDto;
 import ru.practicum.server.user.service.UserService;
-import ru.practicum.server.util.Create;
-import ru.practicum.server.util.Update;
 
 import java.util.List;
 
@@ -31,13 +28,13 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto create(@Validated(Create.class) @RequestBody UserDto userDto) {
+    public UserDto create(@RequestBody UserDto userDto) {
         log.info("POST:/users request received with parameters: userDto = {}", userDto);
         return userService.create(userDto);
     }
 
     @PatchMapping("/{id}")
-    public UserDto update(@Validated(Update.class) @RequestBody UserDto userDto, @PathVariable Long id) {
+    public UserDto update(@RequestBody UserDto userDto, @PathVariable Long id) {
         log.info("PATCH:/users/{id} request received with parameters: userDto = {}, id = {}", userDto, id);
         return userService.update(userDto, id);
     }

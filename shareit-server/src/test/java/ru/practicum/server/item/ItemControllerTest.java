@@ -129,40 +129,6 @@ class ItemControllerTest {
 
     @SneakyThrows
     @Test
-    void create_whenItemIsNotValid_thenReturnedBadRequest() {
-        ItemDto itemDtoIsNotValid = new ItemDto(1L, "", "description", true,
-                null, null, null, 1L);
-
-        mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", 1)
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(itemDtoIsNotValid)))
-                .andExpect(status().isBadRequest());
-        Mockito.verify(itemService, Mockito.never()).create(Mockito.any(), Mockito.any());
-
-        itemDtoIsNotValid = new ItemDto(1L, "name", "description", null,
-                null, null, null, -1L);
-
-        mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", 1)
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(itemDtoIsNotValid)))
-                .andExpect(status().isBadRequest());
-        Mockito.verify(itemService, Mockito.never()).create(Mockito.any(), Mockito.any());
-
-        itemDtoIsNotValid = new ItemDto(1L, "name", "", true,
-                null, null, null, -1L);
-
-        mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", 1)
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(itemDtoIsNotValid)))
-                .andExpect(status().isBadRequest());
-        Mockito.verify(itemService, Mockito.never()).create(Mockito.any(), Mockito.any());
-    }
-
-    @SneakyThrows
-    @Test
     void update() {
         Long itemId = 1L;
 

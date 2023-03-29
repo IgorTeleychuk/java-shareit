@@ -2,16 +2,13 @@ package ru.practicum.server.item.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.server.item.dto.CommentDto;
 import ru.practicum.server.item.dto.CommentShortDto;
 import ru.practicum.server.item.dto.ItemDto;
 import ru.practicum.server.item.dto.ItemShortDto;
 import ru.practicum.server.item.service.ItemService;
-import ru.practicum.server.util.Create;
 
-import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +32,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long userId, @Validated(Create.class) @RequestBody ItemShortDto itemShortDto) {
+    public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemShortDto itemShortDto) {
         log.info("POST:/items request received with parameters: userId = {}, itemDto = {}", userId, itemShortDto);
         return itemService.create(itemShortDto, userId);
     }
@@ -66,7 +63,7 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentDto createComment(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId,
-                                    @Valid @RequestBody CommentShortDto commentShortDto) {
+                                    @RequestBody CommentShortDto commentShortDto) {
         log.info("POST:/items/{itemId}/comment request received with parameters: itemId = {}, userId = {}, commentDto = {}",
                 itemId, userId, commentShortDto);
         return itemService.createComment(itemId, userId, commentShortDto);

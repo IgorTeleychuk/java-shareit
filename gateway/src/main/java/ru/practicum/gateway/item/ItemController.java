@@ -10,8 +10,6 @@ import ru.practicum.gateway.item.dto.CommentRequestDto;
 import ru.practicum.gateway.item.dto.ItemRequestDto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.Collections;
 
 @Controller
@@ -23,11 +21,9 @@ public class ItemController {
     private final ItemClient itemClient;
 
     @GetMapping
-    public ResponseEntity<Object> getItems(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                           @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                           @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+    public ResponseEntity<Object> getItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Get All Items {}", userId);
-        return itemClient.getItems(userId, from, size);
+        return itemClient.getItems(userId);
     }
 
     @GetMapping("/{id}")
@@ -60,14 +56,12 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> searchItem(@RequestParam String text,
-                                             @RequestHeader("X-Sharer-User-Id") Long userId,
-                                             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                             @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.info("Search by Name: {}", text);
         if (text.isBlank()) {
             return ResponseEntity.ok(Collections.emptyList());
         }
-        return itemClient.searchItem(userId, text, from, size);
+        return itemClient.searchItem(userId, text);
     }
 
     @PostMapping("/{itemId}/comment")
