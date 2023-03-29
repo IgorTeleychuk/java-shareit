@@ -24,9 +24,9 @@ services:
   # описание контейнера person-server
   server:
     # имя билда
-    build: server
+    build: shareit-server
     # имя образа
-    image: server-image
+    image: shareit-server-image
     # имя контейнера
     container_name: server-container
     # проброс портов
