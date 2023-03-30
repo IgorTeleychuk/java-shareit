@@ -19,7 +19,7 @@ services:
       - server
     # переменные окружения
     environment:
-      - PERSON_SERVER_URL=http://server:9090
+      - SHAREIT_SERVER_URL=http://server:9090
 
   # описание контейнера person-server
   server:
