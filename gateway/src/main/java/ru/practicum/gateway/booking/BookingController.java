@@ -63,7 +63,7 @@ public class BookingController {
         return bookingClient.approveStatus(userId, bookingId, approved);
     }
 
-    private static BookingState bookingStateFrom (String stateParam) {
+    private static BookingState bookingStateFrom(String stateParam) {
         return BookingState.from(stateParam)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
     }
