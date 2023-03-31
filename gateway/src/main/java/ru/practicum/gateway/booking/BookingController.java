@@ -27,10 +27,8 @@ public class BookingController {
                                          @RequestParam(name = "state", defaultValue = "all") String stateParam,
                                          @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                          @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
         log.info("Getting a reservation with the following status {}, userId={}, from={}, size={}", stateParam, userId, from, size);
-        return bookingClient.getBookings(userId, state, from, size);
+        return bookingClient.getBookings(userId, bookingStateFrom(stateParam), from, size);
     }
 
     @GetMapping("/owner")
@@ -40,19 +38,17 @@ public class BookingController {
                                                              Integer from,
                                            @Positive @RequestParam(name = "size", defaultValue = "10")
                                                              Integer size) {
-        BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
         log.info("Getting the owner's reservation with the status {}, userId={}, from={}, size={}", stateParam, userId, from, size);
-        return bookingClient.getBookingCurrentOwner(userId, state, from, size);
+        return bookingClient.getBookingCurrentOwner(userId, bookingStateFrom(stateParam), from, size);
     }
 
     @PostMapping
     public ResponseEntity<Object> bookItem(@RequestHeader("X-Sharer-User-Id") long userId,
                                            @RequestBody @Valid BookItemRequestDto requestDto) {
         log.info("Creating a reservation {}, userId={}", requestDto, userId);
-        if (!requestDto.getStart().isBefore(requestDto.getEnd())) {
-            throw new BookingException("The start date cannot be later or equal to the end");
-        }
+//        if (!requestDto.getStart().isBefore(requestDto.getEnd())) {
+//            throw new BookingException("The start date cannot be later or equal to the end");
+//        }
         return bookingClient.bookItem(userId, requestDto);
     }
 
@@ -69,6 +65,11 @@ public class BookingController {
                                                 @RequestParam boolean approved) {
         log.info("Confirmation of booking status {}", bookingId);
         return bookingClient.approveStatus(userId, bookingId, approved);
+    }
+
+    private static BookingState bookingStateFrom (String stateParam) {
+        return BookingState.from(stateParam)
+                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
     }
 
 }
