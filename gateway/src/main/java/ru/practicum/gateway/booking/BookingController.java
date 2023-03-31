@@ -8,7 +8,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.gateway.booking.dto.BookItemRequestDto;
 import ru.practicum.gateway.booking.dto.BookingState;
-import ru.practicum.gateway.exception.BookingException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -46,9 +45,6 @@ public class BookingController {
     public ResponseEntity<Object> bookItem(@RequestHeader("X-Sharer-User-Id") long userId,
                                            @RequestBody @Valid BookItemRequestDto requestDto) {
         log.info("Creating a reservation {}, userId={}", requestDto, userId);
-//        if (!requestDto.getStart().isBefore(requestDto.getEnd())) {
-//            throw new BookingException("The start date cannot be later or equal to the end");
-//        }
         return bookingClient.bookItem(userId, requestDto);
     }
 
@@ -71,5 +67,4 @@ public class BookingController {
         return BookingState.from(stateParam)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
     }
-
 }
