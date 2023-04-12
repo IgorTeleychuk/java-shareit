@@ -84,3 +84,6 @@ ___
 
 **DELETE /users/{id}** удаление пользователя по id.
 
+___
+## Схема базы данных
+![](ShareIt DB diagram.jpg)
