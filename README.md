@@ -86,4 +86,4 @@ ___
 
 ___
 ## Схема базы данных
-![](ShareIt DB diagram.jpg)
+![](https://github.com/IgorTeleychuk/java-shareit/blob/main/ShareIt%20DB%20diagram.jpg)
